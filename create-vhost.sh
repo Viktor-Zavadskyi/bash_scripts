@@ -18,22 +18,22 @@ fi
 #  створюємо файл конфіга для апач проксі
 {
 echo "<VirtualHost *:80>"
-echo "		ServerName  ${domain}.bvblogic.dev"
+echo "		ServerName  ${domain}.domain.dev"
 echo "		ProxyPreserveHost On"
 echo "		ProxyPass / http://${ipaddress}/"
 echo "		ProxyPassReverse / http://${ipaddress}/"
 echo "#SSLProxyEngine on"
 echo "</VirtualHost>"
-} > /etc/apache2/sites-available/${domain}.bvblogic.dev.conf
+} > /etc/apache2/sites-available/${domain}.domain.dev.conf
 
 # сімлінкуємо його в папку з конфігами
-ln -s /etc/apache2/sites-available/${domain}.bvblogic.dev.conf /etc/apache2/sites-enabled/${domain}.bvblogic.dev.conf
+ln -s /etc/apache2/sites-available/${domain}.domain.dev.conf /etc/apache2/sites-enabled/${domain}.domain.dev.conf
 
 #  рестартуємо апач
 service apache2 reload
 
 # генеруємо та встановлюємо серетфікат:
-certbot run -d ${domain}.bvblogic.dev --apache -n
+certbot run -d ${domain}.domain.dev --apache -n
 
 #сімлінкуємо серетфікати у папку для маунт шарінга у контейнери і на всякий випадок переназначаємо права на неї:
 cp -Lur /etc/letsencrypt/live /mnt/
@@ -43,7 +43,7 @@ chmod -R 755 /mnt/
 #визначаємо номер контейнера із ip адреса:
 ctnumber=`echo ${ipaddress} | cut -d . -f 4`
 #монтуємо папку з серетфікатами у контейнер:
-pct set ${ctnumber} -mp0 /mnt/live/${domain}.bvblogic.dev,mp=/mnt/${domain}.bvblogic.dev,ro=1
+pct set ${ctnumber} -mp0 /mnt/live/${domain}.domain.dev,mp=/mnt/${domain}.domain.dev,ro=1
 
 #прокидуємо порт для ssh  доступу:
 iptables -t nat -A PREROUTING -i eno1 -p tcp -m tcp --dport 22${ctnumber} -j DNAT --to-destination ${ipaddress}:22
@@ -53,20 +53,20 @@ iptables -t nat -A PREROUTING -i eno1 -p tcp -m tcp --dport 22${ctnumber} -j DNA
 #=========================================================
 
 #перевірка чи є проксі конфіг для апача:
-if [ `apache2ctl -S | grep ${domain}.bvblogic.dev | wc -l` = 0 ]
+if [ `apache2ctl -S | grep ${domain}.domain.dev | wc -l` = 0 ]
     then
 	echo "no domain"
     else
-	echo -e "Apache proxy is \e[5m\e[32m[OK]\e[0m\e[25m --->" `apache2ctl -S | grep ${domain}.bvblogic.dev`
+	echo -e "Apache proxy is \e[5m\e[32m[OK]\e[0m\e[25m --->" `apache2ctl -S | grep ${domain}.domain.dev`
 fi
 
 #перевірка чи є сертефікат для домена у папці для подальшого монтування у контейнери:
 
-if [ -d /mnt/live/${domain}.bvblogic.dev  ]
+if [ -d /mnt/live/${domain}.domain.dev  ]
     then
-echo -e "Sertificate is \e[5m\e[32m[OK]\e[0m\e[25m ---> /mnt/live/"${domain}.bvblogic.dev
+echo -e "Sertificate is \e[5m\e[32m[OK]\e[0m\e[25m ---> /mnt/live/"${domain}.domain.dev
     else
-echo "No sertificate in /mnt/live/"${domain}.bvblogic.dev
+echo "No sertificate in /mnt/live/"${domain}.domain.dev
 fi
 
 #перевірка чи є потрібний контейнер:
