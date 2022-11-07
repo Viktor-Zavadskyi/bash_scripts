@@ -3,14 +3,14 @@
 # перевіряємо чи передані перемінні анрументами, якщо ні, використовуємо внутрішні перемінні;
 if [ -z "$1" ]
     then
-	domain=moodle
+	domain=my-test-domain
     else
 	domain=$1
 fi
 
 if [ -z "$2" ]
     then
-	ipaddress=10.8.0.189
+	ipaddress=10.8.0.111
     else
 	ipaddress=$2
 fi
